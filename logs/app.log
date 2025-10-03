@@ -1,0 +1,26 @@
+2025-10-03 05:21:58,130 - sources.data_fetcher - INFO - Updating data for 06-10-2025
+2025-10-03 05:21:58,130 - sources.data_fetcher - INFO - Successfully updated data for 06-10-2025
+2025-10-03 05:21:58,133 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-03 05:21:58,134 - apscheduler.scheduler - INFO - Added job "update_task" to job store "default"
+2025-10-03 05:21:58,134 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-03 05:21:58,135 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.101.20:5000
+2025-10-03 05:21:58,135 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-03 05:22:27,207 - access - INFO - 2025-10-03 05:22:27 - /leagues - 200 - 0.00s
+2025-10-03 05:22:27,209 - werkzeug - INFO - 127.0.0.1 - - [03/Oct/2025 05:22:27] "GET /leagues HTTP/1.1" 200 -
+2025-10-03 05:23:04,223 - access - INFO - 2025-10-03 05:23:04 - /league/liga-profesional.ics - 200 - 0.06s
+2025-10-03 05:23:04,223 - werkzeug - INFO - 127.0.0.1 - - [03/Oct/2025 05:23:04] "GET /league/liga-profesional.ics HTTP/1.1" 200 -
+2025-10-03 05:23:20,033 - access - INFO - 2025-10-03 05:23:20 - /league/liga-profesional.ics - 200 - 0.01s
+2025-10-03 05:23:20,033 - werkzeug - INFO - 127.0.0.1 - - [03/Oct/2025 05:23:20] "GET /league/liga-profesional.ics HTTP/1.1" 200 -
+2025-10-03 08:29:29,995 - sources.data_fetcher - INFO - Updating data for 06-10-2025
+2025-10-03 08:29:30,576 - sources.data_fetcher - INFO - Successfully updated data for 06-10-2025
+2025-10-03 08:29:30,593 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-10-03 08:29:30,616 - apscheduler.scheduler - INFO - Added job "update_task" to job store "default"
+2025-10-03 08:29:30,618 - apscheduler.scheduler - INFO - Scheduler started
+2025-10-03 08:29:30,634 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.27.0.2:5000
+2025-10-03 08:29:30,636 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
