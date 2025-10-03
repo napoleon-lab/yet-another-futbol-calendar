@@ -96,3 +96,15 @@ def get_dates_to_update():
         date = today + timedelta(days=i)
         dates.append(date.strftime('%d-%m-%Y'))
     return dates
+
+def get_all_dates_range():
+    """Get list of dates from 3 months ago to 30 days ahead"""
+    dates = []
+    today = datetime.now()
+    start_date = today - timedelta(days=90)
+    end_date = today + timedelta(days=30)
+    current = start_date
+    while current <= end_date:
+        dates.append(current.strftime('%d-%m-%Y'))
+        current += timedelta(days=1)
+    return dates

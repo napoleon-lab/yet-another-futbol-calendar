@@ -5,7 +5,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import time
 import os
-from sources.data_fetcher import get_dates_to_update, update_data_for_date, cleanup_old_files, load_data_from_file
+from sources.data_fetcher import get_dates_to_update, update_data_for_date, cleanup_old_files, load_data_from_file, get_all_dates_range
 from sources.ical_generator import generate_ical_for_league
 
 app = Flask(__name__)
@@ -67,19 +67,24 @@ def leagues():
 
 @app.route('/league/<league_url_name>.ics')
 def league_ical(league_url_name):
-    # Load today's data
-    today = get_dates_to_update()[0]
-    data = load_data_from_file(today)
-    if not data:
-        return Response("No data available", status=404)
+    # Load data from last 3 months to next 30 days
+    dates = get_all_dates_range()
+    all_leagues = {}
+    for date in dates:
+        data = load_data_from_file(date)
+        if data:
+            for league in data.get('leagues', []):
+                url_name = league.get('url_name')
+                if url_name not in all_leagues:
+                    all_leagues[url_name] = league.copy()
+                    all_leagues[url_name]['games'] = []
+                all_leagues[url_name]['games'].extend(league.get('games', []))
 
-    leagues = data.get('leagues', [])
-    for league in leagues:
-        if league.get('url_name') == league_url_name:
-            ical_data = generate_ical_for_league(league)
-            return Response(ical_data, mimetype='text/calendar')
+    if league_url_name not in all_leagues:
+        return Response("League not found", status=404)
 
-    return Response("League not found", status=404)
+    ical_data = generate_ical_for_league(all_leagues[league_url_name])
+    return Response(ical_data, mimetype='text/calendar')
 
 def update_task():
     global last_call_time
