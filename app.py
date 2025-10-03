@@ -1,14 +1,29 @@
 from flask import Flask, Response, jsonify, g, request
+from flask_caching import Cache
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import time
 import os
+import glob
+import re
 from sources.data_fetcher import get_dates_to_update, update_data_for_date, cleanup_old_files, load_data_from_file, get_all_dates_range
 from sources.ical_generator import generate_ical_for_league
 
 app = Flask(__name__)
+
+# Cache setup
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+# Rate limiting setup
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per hour"]
+)
 
 # Logging setup
 log_dir = 'logs'
@@ -50,6 +65,7 @@ def health():
 def build():
     return jsonify({"version": "1.0.0"})
 
+@cache.cached(timeout=1800)
 @app.route('/leagues')
 def leagues():
     today = get_dates_to_update()[0]
@@ -65,8 +81,19 @@ def leagues():
         })
     return jsonify(leagues_list)
 
+@cache.cached(timeout=1800)
 @app.route('/league/<league_url_name>.ics')
 def league_ical(league_url_name):
+    # Sanitize input: length check
+    if len(league_url_name) > 80:
+        logging.warning(f"League name too long, length: {len(league_url_name)}")
+        return Response("Invalid league name", status=400)
+
+    # Sanitize input: only allow alphanumeric, underscores, and hyphens
+    if not re.match(r'^[a-zA-Z0-9_-]+$', league_url_name):
+        logging.warning(f"Invalid league name attempted: {league_url_name}")
+        return Response("Invalid league name", status=400)
+
     # Load data from last 3 months to next 30 days
     dates = get_all_dates_range()
     all_leagues = {}
@@ -85,6 +112,24 @@ def league_ical(league_url_name):
 
     ical_data = generate_ical_for_league(all_leagues[league_url_name])
     return Response(ical_data, mimetype='text/calendar')
+
+@cache.cached(timeout=1800)
+@app.route('/fetched-days')
+def fetched_days():
+    files = glob.glob(os.path.join('data/futbol', '*-promiedos.json'))
+    result = []
+    now = time.time()
+    for file in files:
+        filename = os.path.basename(file)
+        date_str = filename.replace('-promiedos.json', '')
+        mtime = os.path.getmtime(file)
+        age_seconds = now - mtime
+        if age_seconds < 3600:
+            age = f"{int(age_seconds / 60)} minutes"
+        else:
+            age = f"{int(age_seconds / 3600)} hours"
+        result.append({"date": date_str, "age": age})
+    return jsonify(result)
 
 def update_task():
     global last_call_time
